@@ -52,6 +52,13 @@ def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     # No trailing newline: the file holds exactly the entry text.
     TARGET.write_text(EXCUSE, encoding="utf-8")
+    # Self-verification guard: re-read what landed on disk and refuse to
+    # report success on a partial or corrupt write. The file must be
+    # exactly the excuse constant — one line, no trailing newline.
+    written = TARGET.read_text(encoding="utf-8")
+    assert written == EXCUSE, "entry.txt content mismatch after write"
+    assert "\n" not in written, "entry.txt must be exactly one line"
+    assert not written.endswith("\n"), "entry.txt must have no trailing newline"
     print(EXCUSE)
 
 
